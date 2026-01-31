@@ -1,51 +1,45 @@
 import { Request, Response } from 'express';
+import { Location } from './models';
+import { checkGeofences } from './geofenceController';
 
-// In-memory storage for demonstration purposes
-// In a real enterprise app, this would be a database (e.g., PostgreSQL/MongoDB)
-interface LocationData {
-  deviceId: string;
-  latitude: number;
-  longitude: number;
-  timestamp: number;
-}
+export const updateLocation = async (req: Request, res: Response) => {
+  try {
+    const { deviceId, latitude, longitude } = req.body;
 
-const locationHistory: LocationData[] = [];
+    if (!deviceId || !latitude || !longitude) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
-export const updateLocation = (req: Request, res: Response) => {
-  const { deviceId, latitude, longitude } = req.body;
+    const newLocation = await Location.create({
+      deviceId,
+      latitude,
+      longitude,
+    });
 
-  if (!deviceId || !latitude || !longitude) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    // Async check for geofence violations
+    checkGeofences(deviceId, latitude, longitude);
+
+    console.log(`Location received for ${deviceId}: ${latitude}, ${longitude}`);
+    return res.status(200).json({ message: 'Location updated', data: newLocation });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-
-  const newLocation: LocationData = {
-    deviceId,
-    latitude,
-    longitude,
-    timestamp: Date.now(),
-  };
-
-  locationHistory.push(newLocation);
-
-  // Keep only the last 100 records for memory efficiency in this demo
-  if (locationHistory.length > 100) {
-    locationHistory.shift();
-  }
-
-  console.log(`Location received for ${deviceId}: ${latitude}, ${longitude}`);
-  return res.status(200).json({ message: 'Location updated', data: newLocation });
 };
 
-export const getLocationHistory = (req: Request, res: Response) => {
-  const { deviceId } = req.query;
+export const getLocationHistory = async (req: Request, res: Response) => {
+  try {
+    const { deviceId } = req.query;
+    const where = deviceId ? { deviceId } : {};
 
-  if (deviceId) {
-    const history = locationHistory.filter(loc => loc.deviceId === deviceId);
+    const history = await Location.findAll({
+      where,
+      order: [['timestamp', 'DESC']],
+      limit: 100 // Limit for performance
+    });
+
     return res.status(200).json(history);
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to fetch location history' });
   }
-
-  // If no deviceId, return all (or handle accordingly)
-  // For this demo, we'll just return the whole history sorted by latest
-  const sortedHistory = [...locationHistory].sort((a, b) => b.timestamp - a.timestamp);
-  return res.status(200).json(sortedHistory);
 };
