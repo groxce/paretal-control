@@ -7,7 +7,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null); // Added success state
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ const LoginPage = () => {
 
       if (isRegister) {
         setIsRegister(false);
-        setSuccess('Registration successful! Please login.'); // Set success message
+        setSuccess('Registration successful! Please login.');
       } else {
         localStorage.setItem('token', data.token);
         router.push('/');
@@ -42,37 +42,46 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'Arial' }}>
-      <div style={{ padding: '30px', border: '1px solid #ccc', borderRadius: '8px', width: '300px' }}>
-        <h2>{isRegister ? 'Register' : 'Login'}</h2>
-        {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
-        {success && <p style={{ color: 'green', fontSize: '14px' }}>{success}</p>}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: '8px' }}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ padding: '8px' }}
-          />
-          <button type="submit" style={{ padding: '10px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-8">{isRegister ? 'Create Account' : 'Welcome Back'}</h2>
+
+        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm font-medium text-center">{error}</div>}
+        {success && <div className="bg-green-50 text-green-600 p-3 rounded-lg mb-4 text-sm font-medium text-center">{success}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+            />
+          </div>
+          <button type="submit" className="w-full py-3 px-4 bg-primary text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md">
             {isRegister ? 'Register' : 'Login'}
           </button>
         </form>
-        <p style={{ marginTop: '15px', fontSize: '14px', textAlign: 'center' }}>
+
+        <p className="mt-6 text-center text-sm text-gray-600">
           {isRegister ? 'Already have an account? ' : "Don't have an account? "}
           <span
             onClick={() => setIsRegister(!isRegister)}
-            style={{ color: '#0070f3', cursor: 'pointer', textDecoration: 'underline' }}
+            className="text-primary font-bold cursor-pointer hover:underline"
           >
             {isRegister ? 'Login' : 'Register'}
           </span>

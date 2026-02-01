@@ -7,18 +7,16 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Check if token exists on mount
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
 
-    // Listen to storage events to update state if token changes elsewhere
     const handleStorageChange = () => {
        const token = localStorage.getItem('token');
        setIsLoggedIn(!!token);
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [router.asPath]); // Re-run on route change
+  }, [router.asPath]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -27,24 +25,24 @@ const Navbar = () => {
   };
 
   return (
-    <nav style={{ padding: '10px 20px', backgroundColor: '#333', color: '#fff', marginBottom: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <h2 style={{ margin: 0 }}>Safeguard Kids</h2>
+    <nav className="bg-white border-b border-gray-200 px-6 py-4 mb-8">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-8">
+          <h2 className="text-2xl font-bold text-primary">Safeguard Kids</h2>
           {isLoggedIn && (
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <Link href="/" style={{ color: '#fff', textDecoration: 'none' }}>Dashboard</Link>
-              <Link href="/geofences" style={{ color: '#fff', textDecoration: 'none' }}>Geofences</Link>
-              <Link href="/usage" style={{ color: '#fff', textDecoration: 'none' }}>App Usage</Link>
+            <div className="hidden md:flex gap-6">
+              <Link href="/" className="text-gray-600 hover:text-primary font-medium transition-colors">Dashboard</Link>
+              <Link href="/geofences" className="text-gray-600 hover:text-primary font-medium transition-colors">Geofences</Link>
+              <Link href="/usage" className="text-gray-600 hover:text-primary font-medium transition-colors">App Usage</Link>
             </div>
           )}
         </div>
         {isLoggedIn ? (
-          <button onClick={handleLogout} style={{ backgroundColor: 'transparent', border: '1px solid #fff', color: '#fff', padding: '5px 10px', cursor: 'pointer' }}>
+          <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors">
             Logout
           </button>
         ) : (
-          <Link href="/login" style={{ color: '#fff', textDecoration: 'none' }}>Login</Link>
+          <Link href="/login" className="text-sm font-medium text-primary hover:text-blue-700 transition-colors">Login</Link>
         )}
       </div>
     </nav>

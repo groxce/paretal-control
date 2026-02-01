@@ -20,9 +20,11 @@ const GeofencesPage = () => {
 
   const fetchGeofences = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/geofence');
+      const res = await fetch('http://localhost:3001/api/geofence', {
+         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       const data = await res.json();
-      setGeofences(data);
+      setGeofences(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -39,7 +41,10 @@ const GeofencesPage = () => {
     try {
       await fetch('http://localhost:3001/api/geofence', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(newGeofence)
       });
       fetchGeofences();
@@ -50,19 +55,22 @@ const GeofencesPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Geofences</h1>
+    <div className="max-w-7xl mx-auto px-6 font-sans">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Geofences</h1>
+        <p className="text-gray-500 mt-1">Set up safe zones for your children.</p>
+      </div>
 
-      <div style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
-        <h3>Add New Geofence</h3>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Geofence</h3>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             type="text"
             placeholder="Name (e.g., Home)"
             value={newGeofence.name}
             onChange={e => setNewGeofence({...newGeofence, name: e.target.value})}
             required
-            style={{ padding: '8px' }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
           <input
             type="number"
@@ -71,7 +79,7 @@ const GeofencesPage = () => {
             value={newGeofence.latitude}
             onChange={e => setNewGeofence({...newGeofence, latitude: parseFloat(e.target.value)})}
             required
-            style={{ padding: '8px' }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
           <input
             type="number"
@@ -80,43 +88,50 @@ const GeofencesPage = () => {
             value={newGeofence.longitude}
             onChange={e => setNewGeofence({...newGeofence, longitude: parseFloat(e.target.value)})}
             required
-            style={{ padding: '8px' }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
-          <input
-            type="number"
-            placeholder="Radius (meters)"
-            value={newGeofence.radius}
-            onChange={e => setNewGeofence({...newGeofence, radius: parseFloat(e.target.value)})}
-            required
-            style={{ padding: '8px' }}
-          />
-          <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#0070f3', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            Add Geofence
-          </button>
+          <div className="flex gap-2">
+             <input
+              type="number"
+              placeholder="Radius (m)"
+              value={newGeofence.radius}
+              onChange={e => setNewGeofence({...newGeofence, radius: parseFloat(e.target.value)})}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            />
+            <button type="submit" className="px-6 py-2 bg-primary text-white rounded-lg font-bold hover:bg-blue-700 transition-colors whitespace-nowrap">
+              Add
+            </button>
+          </div>
         </form>
       </div>
 
-      {loading ? <p>Loading...</p> : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f2f2f2', textAlign: 'left' }}>
-              <th style={{ padding: '10px' }}>Name</th>
-              <th style={{ padding: '10px' }}>Latitude</th>
-              <th style={{ padding: '10px' }}>Longitude</th>
-              <th style={{ padding: '10px' }}>Radius (m)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {geofences.map((geo, idx) => (
-              <tr key={geo.id || idx} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: '10px' }}>{geo.name}</td>
-                <td style={{ padding: '10px' }}>{geo.latitude}</td>
-                <td style={{ padding: '10px' }}>{geo.longitude}</td>
-                <td style={{ padding: '10px' }}>{geo.radius}</td>
+      {loading ? <div className="text-gray-500 animate-pulse">Loading...</div> : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 font-semibold text-gray-700">Name</th>
+                <th className="px-6 py-4 font-semibold text-gray-700">Latitude</th>
+                <th className="px-6 py-4 font-semibold text-gray-700">Longitude</th>
+                <th className="px-6 py-4 font-semibold text-gray-700">Radius</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {geofences.map((geo, idx) => (
+                <tr key={geo.id || idx} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 font-medium text-gray-900">{geo.name}</td>
+                  <td className="px-6 py-4 text-gray-600">{geo.latitude}</td>
+                  <td className="px-6 py-4 text-gray-600">{geo.longitude}</td>
+                  <td className="px-6 py-4 text-gray-600">{geo.radius}m</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {geofences.length === 0 && (
+              <div className="p-6 text-center text-gray-500">No geofences found.</div>
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { api } from '../services/api';
+import { theme } from '../theme';
 
 export default function UsageScreen() {
   const [usage, setUsage] = useState([]);
@@ -19,57 +20,82 @@ export default function UsageScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>App Usage History</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>App Usage</Text>
 
       <FlatList
+        contentContainerStyle={styles.list}
         data={usage}
         keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <View style={styles.row}>
               <Text style={styles.app}>{item.appName}</Text>
-              <Text style={styles.duration}>{item.duration} mins</Text>
+              <View style={styles.durationBadge}>
+                <Text style={styles.duration}>{item.duration} min</Text>
+              </View>
             </View>
-            <Text style={styles.meta}>{item.deviceId} - {item.date}</Text>
+            <View style={styles.metaRow}>
+                <Text style={styles.meta}>{item.deviceId}</Text>
+                <Text style={styles.meta}>{item.date}</Text>
+            </View>
           </View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: theme.spacing.m,
+    backgroundColor: theme.colors.background,
   },
   header: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: theme.spacing.m,
+    color: theme.colors.text,
+  },
+  list: {
+      paddingBottom: theme.spacing.xl,
   },
   item: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    padding: theme.spacing.m,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.borderRadius,
+    marginBottom: theme.spacing.m,
+    ...theme.shadow,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    alignItems: 'center',
+    marginBottom: theme.spacing.s,
   },
   app: {
     fontWeight: 'bold',
     fontSize: 16,
+    color: theme.colors.text,
+  },
+  durationBadge: {
+      backgroundColor: '#eff6ff',
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 12,
   },
   duration: {
     fontWeight: 'bold',
-    color: '#0070f3',
+    color: theme.colors.primary,
+    fontSize: 12,
+  },
+  metaRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
   },
   meta: {
-    color: '#666',
+    color: theme.colors.textSecondary,
     fontSize: 12,
   }
 });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { initSocket } from '../services/socket';
+import { theme } from '../theme';
 
 export default function LiveScreen({ route }) {
   const { deviceId } = route.params;
@@ -18,13 +19,10 @@ export default function LiveScreen({ route }) {
     });
 
     socket.on('offer', (data) => {
-      // In real app, handle WebRTC offer here
       Alert.alert('Stream Started', 'Receiving simulated stream data');
     });
 
-    return () => {
-      // socket.disconnect(); // Keep alive for navigation
-    };
+    return () => {};
   }, []);
 
   const requestStream = (type) => {
@@ -36,51 +34,123 @@ export default function LiveScreen({ route }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Monitor: {deviceId}</Text>
-      <Text style={styles.status}>Status: {status}</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+          <Text style={styles.title}>Live Monitor</Text>
+          <View style={styles.badge}>
+             <Text style={styles.badgeText}>{deviceId}</Text>
+          </View>
+      </View>
+
+      <View style={styles.viewerContainer}>
+          <View style={styles.viewer}>
+            <Text style={styles.viewerText}>
+            {streamType ? (
+                `Receiving ${streamType} stream...`
+            ) : (
+                'Select a mode to start streaming'
+            )}
+            </Text>
+            {streamType && <Text style={styles.subText}>(WebRTC Simulation)</Text>}
+          </View>
+          <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>{status}</Text>
+          </View>
+      </View>
 
       <View style={styles.controls}>
-        <Button title="Screen Share" onPress={() => requestStream('screen')} />
-        <View style={{ height: 10 }} />
-        <Button title="Listen In" color="green" onPress={() => requestStream('audio')} />
-      </View>
+        <TouchableOpacity style={styles.button} onPress={() => requestStream('screen')}>
+            <Text style={styles.buttonText}>Start Screen Share</Text>
+        </TouchableOpacity>
 
-      <View style={styles.viewer}>
-        <Text style={styles.viewerText}>
-          {streamType ? `Receiving ${streamType}...` : 'No Active Stream'}
-        </Text>
+        <TouchableOpacity style={[styles.button, styles.audioButton]} onPress={() => requestStream('audio')}>
+            <Text style={styles.buttonText}>Listen In</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.m,
   },
   header: {
-    fontSize: 20,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.l,
+  },
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 5,
+    color: theme.colors.text,
   },
-  status: {
-    color: '#666',
-    marginBottom: 20,
+  badge: {
+      backgroundColor: theme.colors.border,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
   },
-  controls: {
-    marginBottom: 30,
+  badgeText: {
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+  },
+  viewerContainer: {
+      flex: 1,
+      marginBottom: theme.spacing.l,
+      position: 'relative',
   },
   viewer: {
     flex: 1,
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: theme.borderRadius,
+    ...theme.shadow,
   },
   viewerText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  subText: {
+      color: '#666',
+      fontSize: 12,
+      marginTop: 8,
+  },
+  statusBadge: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+  },
+  statusText: {
+      color: '#fff',
+      fontSize: 10,
+      fontWeight: 'bold',
+  },
+  controls: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  button: {
+      flex: 1,
+      backgroundColor: theme.colors.primary,
+      padding: theme.spacing.m,
+      borderRadius: 8,
+      alignItems: 'center',
+  },
+  audioButton: {
+      backgroundColor: theme.colors.success,
+  },
+  buttonText: {
+      color: '#fff',
+      fontWeight: 'bold',
   }
 });
