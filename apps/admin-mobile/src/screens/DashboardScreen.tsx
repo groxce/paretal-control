@@ -38,6 +38,7 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.device}>{item.deviceId}</Text>
             <Text>Lat: {item.latitude}, Lon: {item.longitude}</Text>
             <Text style={styles.time}>{new Date(item.timestamp).toLocaleString()}</Text>
+            <Button title="Monitor Live" onPress={() => navigation.navigate('Live', { deviceId: item.deviceId })} />
           </View>
         )}
       />

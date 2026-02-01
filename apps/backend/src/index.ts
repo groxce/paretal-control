@@ -9,9 +9,13 @@ import { createGeofence, getGeofences } from './geofenceController';
 import { logAppUsage, getAppUsage } from './usageController';
 import { register, login } from './authController';
 import { authMiddleware } from './authMiddleware';
+import { createServer } from 'http';
+import { initSocket } from './socket';
 
 const app = express();
 const port = 3001;
+const httpServer = createServer(app);
+const io = initSocket(httpServer);
 
 // Security Middleware
 app.use(helmet());
@@ -49,7 +53,7 @@ app.get('/api/usage', authMiddleware, getAppUsage);
 // Sync Database and Start Server
 sequelize.sync().then(() => {
   console.log('Database synced');
-  app.listen(port, () => {
+  httpServer.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
   });
 }).catch((err) => {

@@ -55,6 +55,7 @@ const Dashboard = () => {
                   <th style={{ padding: '8px', border: '1px solid #ddd' }}>Latitude</th>
                   <th style={{ padding: '8px', border: '1px solid #ddd' }}>Longitude</th>
                   <th style={{ padding: '8px', border: '1px solid #ddd' }}>Time</th>
+                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -64,6 +65,9 @@ const Dashboard = () => {
                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{loc.latitude}</td>
                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{loc.longitude}</td>
                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{new Date(loc.timestamp).toLocaleString()}</td>
+                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>
+                      <a href={`/live/${loc.deviceId}`} style={{ color: '#0070f3' }}>Monitor Live</a>
+                    </td>
                   </tr>
                 ))}
               </tbody>
